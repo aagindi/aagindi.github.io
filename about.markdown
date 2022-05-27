@@ -4,15 +4,14 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
+J'adoube (pronounced /ZHaˈdo͞ob/) is a French word frequently used by chess players meaning *I adjust*.
 
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
+For me, this capacity for adjustment constitutes a sort of professional credo. When I write code, and I sense that I'm going down the wrong path, *j'adoube*. When a different technique has the potential to improve my work, *j'adoube*. When a new idea piques my interest, *j'adoube*.
 
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
+### About This
 
+This site will likely fail to clearly embody that ideal. My vision for this place is a showcase, an opportunity to display things after they're complete (enough) and perhaps even a bit polished. To better represent the philosophy *j'adoube* I would need to give impractically frequent, minutiae-laden reports - and who would want to read that?
 
-[jekyll-organization]: https://github.com/jekyll
+### About Me
+
+Hello, I'm Aaron. I love board games, cycling, and cooking. Also, I really like cats and coffee. And maths. I'm a software developer by the way.
