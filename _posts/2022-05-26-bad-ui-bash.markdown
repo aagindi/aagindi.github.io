@@ -3,6 +3,7 @@ layout: post
 title:  "Bad UI Bash"
 date:   2022-05-26 15:09:43
 categories: event
+published: false
 ---
 
 Last week, I cohosted an M&T Tech Coding Challenge called the Bad UI Bash. The general task was to make the worst user interface imaginable for the applying to a job and submitting a resume. Here are excerpts of some of the "copywriting" I did to promote the event:
