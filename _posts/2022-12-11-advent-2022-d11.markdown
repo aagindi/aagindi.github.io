@@ -1,0 +1,189 @@
+---
+layout: post
+title:  "Advent of Abstraction"
+date:   2022-12-11 12:00:00
+categories: problem
+---
+
+### Introduction
+As I recently learned, there is a holiday tradition in the software engineering profession called Advent of Code. It is a collection of two part problems, each one released at midnight for the first 25 days of December, like an Advent Calendar. There is a global leaderboard, a subreddit, and dozens of sponsors. I do not exactly work fast, so I will not be placing on the leaderboard any time soon, but I do very much enjoy tackling these problems. There is a particular joy in working out a solution to the first part only to have the second part force you to generalize your solution. It has been said that Computer Science is the study of abstraction, and yesterday's puzzle [(Dec 11th, 2022)](https://adventofcode.com/2022/day/11) summons that to mind more than any of the previous days puzzles. 
+
+### Abstraction
+There are many ways to define abstraction; a typical "on the job" definition is delegating responsibility for details to something down the chain and instead only focusing on the big picture, the high level. This is embodied by the <i>abstract</i> keyword in Java, which allows a class to claim to have a certain behavior, but delegating the implementation of that behavior to a subclass. There is another, more mathematically oriented definition that is relevant - abstraction is the process of extracting the essential properties of an object, divorcing it from it's original meaning. This distillation is turned toward an unlikely subject in the problem.
+
+### The Problem, Part I
+Like all Advent of Code problems before it, this one has a cute story. You're beset by troublemaking monkeys whose actions are driven by how stressed out they make you. However, for the sake of clarity, I'll abstract away the plot and some of the unnecessary<i>(?)</i> details. Suppose that you have buckets labeled 0 to $$ k $$ that contain integers. Each bucket has an operation and a test. During each cycle, for each bucket in order from 0 to $$k$$, perform the operation on each integer in the bucket. Then, use the test to determine which new bucket to move it to. The goal is to find out how many times the operation is run for each bucket over $$n$$ cycles. In Part I, $$n = 20$$ and the operation is specified to do what it does but then additionally floor-divide by 3. This is fairly straightforward to code up, here's some quick and dirty python code:
+
+{% highlight python %}
+class Bucket:
+
+    def __init__(self, items, operation, test):
+        self.items = items
+        self.operation = operation
+        self.test = test
+        self.op_counter = 0
+
+    def perf_operations(self):
+        for i in range(len(self.items)):
+            old = self.items[i]
+            self.items[i] = eval(self.operation)
+            self.op_counter += 1
+    
+    def floor_divide_items(self):
+        for i in range(len(self.items)):
+            self.items[i] = self.items[i] // 3
+
+    def test_items(self):
+        (test_divisor, dest1, dest2) = self.test
+        for i in self.items:
+            if i % test_divisor == 0:
+                yield (i, dest1)
+            else:
+                yield (i, dest2)
+
+    def clear_list(self):
+        self.items = list()
+
+if __name__ == "__main__":
+    with open("d11_mm\input.txt") as reader:
+        bucket_defs = reader.read().strip().split('\n\n')
+        
+        buckets = list()
+
+        for bucket_def in bucket_defs:
+            lines = bucket_def.strip().split("\n")
+            items = eval('[' + lines[1].split(':')[1].strip() + ']')
+            operation = lines[2].split('=')[1].strip()
+            test = (int(lines[3].split(' ')[-1]), int(lines[4].split(' ')[-1]),
+                    int(lines[5].split(' ')[-1]))
+            
+            buckets.append(Bucket(items, operation, test))
+        
+        for round in range(20):
+            for bucket in buckets:
+                bucket.perf_operations()
+                bucket.floor_divide_items()
+                test_results = bucket.test_items()
+                for r in test_results:
+                    item = r[0]
+                    dest = r[1]
+                    buckets[dest].items.append(item)
+                bucket.clear_list()
+        
+        print([b.op_counter for b in buckets])
+{% endhighlight %}
+
+Feel free to read through it if you like, but it essentially just does what I described above, nothing clever at all. However, Part II has a twist in store.
+
+### The Problem, Part II
+In this part of the problem, the training wheels come off. There are only two changes, but they force you to reevaluate the entire strategy. First, the floor division step is removed, and second, $$n = 10000$$. At first blush, this doesn't seem like a problem. After all, the number of integers never increases, only shifted from bucket to bucket. This means that the space should be constant in the number of integers. However, I abstracted away some crucial details when describing the problem. There are three possible operations - addition of a constant, multiplication with a constant, and squaring the number. The addition is not a problem, but the number of bits required to represent each integer increases with each multiplication and squaring operation. In particular, multiplication by c increases it by ~$$\log_2(c)$$, and squaring the number doubles it. This was not important in Part I because there were only 20 rounds and the floor division operation kept things in check. Without those guards in place, things go off the rails very quickly. How exactly they go off the rails is language dependent. In Java 17, the numbers overflow and set themselves to 0. In Python, integers have arbitrary precision, so the interpreter will attempt the run the program, and eventually crash when it runs out of space. Another important detail that I left out was that all of the tests take the form of checking if the item is divisible by a prime.
+
+The solution here is to employ abstraction to the source of the problem. It may feel strange to abstract the property of being a number, but let us try to construct something better. The first step is to enumerate everything that we want the new object to be able to do. Looking at the Bucket class, it is clear that members of the <i>items</i> list are used 4 ways. They are mutated by addition, multiplication, and squaring, and also their congruence modulo $$p$$ is checked. Even with this extracted out, it may not be obvious how to proceed. However, the congruence modulo $$p$$ should get you thinking about Modular Arithmetic.
+
+### Tangent in Modular Arithmetic
+This is the classic "clock math" that is taught to both 1st graders and first-year discrete math students. The formal definition is as follows:
+
+Let $$a, b$$ be integers. Then, $$a \cong b \mod n \iff \exists k : a - b = nk$$. In plain english, this means that b is the remainder when a is divided by n. There are a ton of useful properties and fun theorems to prove, but the most basic ones are relevant here. Suppose $$a \cong b \mod n$$. Then:
+
+1.$$~\forall c: a+c \cong b+c \mod n$$
+
+2.$$~\forall c: ac \cong bc \mod n$$
+
+3.$$a^2 \cong b^2 \mod n$$.
+
+At this point, we're already prepared to return back to our problem. Suppose the number that we care about is $$a$$. The three facts listed above mean that the only relevant fact, $$a$$'s divisibility by $$p$$, can be tracked without storing $$a$$, since the result will always be the same for $$b$$. In other words, we can apply any number of any of the types of operations, and $$a$$ and $$b$$ will still have the same divisibility with respect to $$p$$.
+
+This does not mean that we can just substitute out $$a$$ for $$b$$ because $$p$$ is different for each bucket. Suppose we have buckets with the following initial items and rules:
+
+Bucket 0: 5<br>
+    Operation: new = old + 1<br>
+    Test: If divisible by 2, move to 1, else move to 2<br>
+
+Bucket 1: {}<br>
+    Operation: new = old * old<br>
+    Test: If divisible by 3, move to 0, else move to 2<br>
+
+Bucket 2: {}<br>
+    Operation: new = old + 2<br>
+    Test: If divisible by 5, move to 1, else move to 2<br>
+
+It is clear that the single item travels with the following path: 0 -> 1 -> 2
+
+However, if you replace the 5 with it's remainder mod 2, you get this path: 0 -> 1 -> 0
+
+It is clear from this that we need to keep track of the remainder for each of the checks. Let's replace 5 with the tuple $$ (5 \% 2, 5 \% 3, 5 \% 5 ) = (1, 2, 0)$$.
+
+Tracing it through the first two cycles, it becomes $$((1+1)\%2, (2+1)\%3, (0+1)\%5) = (0,0,1)$$, and since the first entry is 0, it is divisible by 2, so it moves to Bucket #1. Then, it becomes $$(0,0,1)$$ and moves to Bucket #2 since the second entry is 0. So, this tuple acts just as the 5 would.
+
+### Implementation
+Here's some Python implementing this new data structure.
+
+{% highlight python %}
+class Item:
+
+    def __init__(self, n, divisors):
+        self.divisors = divisors
+        self.trackers = [n % d for d in divisors]
+
+    def add(self, n):
+        self.trackers = [(i + n) % d for (i, d) in zip(self.trackers, self.divisors)]
+
+    def multiply(self, n):
+        self.trackers = [(i * n) % d for (i, d) in zip(self.trackers, self.divisors)]
+
+    def square(self):
+        self.trackers = [(i * i) % d for (i, d) in zip(self.trackers, self.divisors)]
+
+    def mod(self, d):
+        i = self.divisors.index(d)
+        return self.trackers[i]
+{% endhighlight %}
+
+Looking at this, it seems at first blush to be bigger than just a normal integer. This is true for small integers, but as is usually the case, the asymptotic behavior is more important. As discussed, the number of bits required to represent an integer in our case spirals out of control, in the worst case it is $$O(2^n)$$ (doubling every cycle). This structure, however, takes constant space since the number of trackers is predetermined and each tracker is capped by the size of the predetermined divisors.
+
+Another question that comes to mind is whether we can go back and forth from our representation and integers. The answer is no, because this data structure does not uniquely determine integers. How could it if integers are arbitrarily large and this is bounded in size? This is actually one of the canonical examples of the algebraic concept of a [quotient group](https://en.wikipedia.org/wiki/Quotient_group). We no longer are operating on integers, but a brand new item that represents an infinitely large set of integers.
+
+### The Solution
+A few changes are made from the original code, here's the new Bucket class:
+
+{% highlight python %}
+class Bucket:
+
+    def __init__(self, items, divisors, operation, test):
+        self.items = [Item(i, divisors) for i in items] # <--
+        self.operation = operation
+        if self.operation != 'old * old':
+            self.c = int(self.operation.split(' ')[-1].strip())
+            self.operation = self.operation.split(' ')[-2].strip()
+        else:
+            self.operation = '**'
+        self.test = test
+        self.op_counter = 0
+
+    def perf_operations(self):
+        for i in self.items:
+            if '**' == self.operation:
+                i.square()
+            elif '*' == self.operation:
+                i.multiply(self.c)
+            elif '+' == self.operation:
+                i.add(self.c)
+            self.op_counter += 1
+
+    def test_items(self):
+        (test_divisor, dest1, dest2) = self.test
+        for i in self.items:
+            if i.mod(test_divisor) == 0:
+                yield (i, dest1)
+            else:
+                yield (i, dest2)
+
+    def clear_list(self):
+        self.items = list()
+{% endhighlight %}
+
+Notice how it is almost identical to the original class - there are no semantic differences, only syntactic ones. That is because the interface (the set of methods) of our new item class was engineered to exactly match what the Bucket class needed. The number was lost, but the functionality remains exactly the same. A few more changes were made to the main function, mainly the loop range and the removal of the floor division step, but it was also practically unchanged.
+
+
+### Final Thoughts
+This was my favorite Advent of Code problem yet, I love how mathy it got. It reminded me of one of my favorite concepts that I learned during Abstract Algebra, the quotient group, and in particular the idea that you can map an infinite group into a finite one. I love how tangible and precise this idea became in this problem - the unbounded space required by an arbitrarily sized integer mapped into the constant space Item object. I'm really looking forward to what the rest of the month has in store.
