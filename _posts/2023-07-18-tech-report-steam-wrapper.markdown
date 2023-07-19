@@ -79,4 +79,4 @@ async function readTime() {
 readTime();
 </script>
 
-Is this an enterprize quality solution to this problem? Hell no. Look at the link I'm fetching from! There are surely many improvements that can be made to bring this in line with commercial quality. However, this is not a commercial application. The situation is strictly personal, so it's acceptable for the solution to be as well.
+Is this an enterprize quality solution to this problem? Hell no. Look at the link I'm fetching from! It probably doesn't even work if you're using a modern browser. (Hint for Firefox users - click on the padlock icon next to the address bar, click on the one in the pop-up, and then select "Disable protection for now") There are surely many improvements that can be made to bring this in line with commercial quality. However, this is not a commercial application. The situation is strictly personal, so it's acceptable for the solution to be as well.
