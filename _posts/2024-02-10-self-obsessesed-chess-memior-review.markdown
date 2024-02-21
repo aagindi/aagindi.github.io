@@ -2,7 +2,7 @@
 layout: post
 title:  "A Half-Assed, Self-Obsessed Review of a Chess Memoir"
 date:   2024-02-10 8:02:20
-categories: problem
+categories: book chess
 ---
 
 ### Our Subject

@@ -2,7 +2,7 @@
 layout: post
 title:  "An Interesting Rosalind Problem"
 date:   2022-06-10 19:02:20
-categories: problem
+categories: math code bio
 ---
 
 ### Introduction

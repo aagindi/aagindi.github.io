@@ -2,7 +2,7 @@
 layout: post
 title:  "Advent of Abstraction"
 date:   2022-12-12 6:00:00
-categories: problem
+categories: math code
 ---
 
 ### Introduction

@@ -1,0 +1,89 @@
+---
+layout: default
+---
+<script src="https://kit.fontawesome.com/2e5c0949cc.js" crossorigin="anonymous"></script>
+
+<div class="home">
+  {%- if page.title -%}
+    <h1 class="page-heading">{{ page.title }} </h1>
+  {%- endif -%}
+
+  {{ content }}
+
+  {%- if site.posts.size > 0 -%}
+    <h2 class="post-list-heading">{{ page.list_title | default: "Posts" }}</h2>
+    <ul class="post-list">
+      {%- for post in site.posts -%}
+      <li>
+        {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+        <span class="post-meta">{{ post.date | date: date_format }}</span>
+        <h3 class="post-title">
+          <a class="post-link" href="{{ post.url | relative_url }}">
+            {{ post.title | escape }}
+          </a>
+        </h3>
+
+        <!-- Tag display -->
+        <div class="tags">
+        {%- if post.categories contains "problem" -%}
+            <i class="fa-solid fa-calculator"></i>
+        {%- endif -%}
+        {%- if post.categories contains "bio" -%}
+            <i class="fa-solid fa-dna"></i>
+        {%- endif -%}
+        {%- if post.categories contains "math" -%}
+            <i class="fa-solid fa-calculator"></i>
+        {%- endif -%}
+        {%- if post.categories contains "code" -%}
+            <i class="fa-solid fa-code"></i>
+        {%- endif -%}
+        {%- if post.categories contains "book" -%}
+            <i class="fa-solid fa-book"></i>
+        {%- endif -%}
+        {%- if post.categories contains "chess" -%}
+            <i class="fa-solid fa-chess"></i>
+        {%- endif -%}
+        {%- if post.categories contains "animation" -%}
+            <i class="fa-solid fa-film"></i>
+        {%- endif -%}
+
+        {%- if site.show_excerpts -%}
+          {{ post.excerpt }}
+        {%- endif -%}
+        </div>
+      </li>
+      {%- endfor -%}
+    </ul>
+
+    <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | relative_url }}">via RSS</a></p>
+  {%- endif -%}
+
+</div>
+
+<style>
+.post-title {
+    margin: 4px 0 4px 0;
+}
+
+.tags {
+    display: block;
+    text-align: baseline;
+}
+
+.tags i:nth-child(1) {
+    color: gray;
+}
+
+.tags i:nth-child(2) {
+    color: darkgray;
+}
+
+.tags i:nth-child(3) {
+    color: lightgray;
+}
+
+i {
+    width: 25px;
+    text-align: center;
+}
+</style>

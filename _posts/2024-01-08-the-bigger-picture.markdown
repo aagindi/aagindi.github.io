@@ -2,7 +2,7 @@
 layout: post
 title:  "The Bigger Picture"
 date:   2024-01-08 08:02:20
-categories: problem
+categories: math code animation
 ---
 
 ### Introduction
