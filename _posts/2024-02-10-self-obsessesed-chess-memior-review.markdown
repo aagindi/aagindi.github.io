@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "A Half-Assed, Self-Obsessed Review of a Chess Memoir"
+title:  "A Half-Assed, Self-Obsessed Chess Memoir Review"
 date:   2024-02-10 8:02:20
 categories: book chess
 ---

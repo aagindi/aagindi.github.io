@@ -44,7 +44,10 @@ layout: default
             <i class="fa-solid fa-chess"></i>
         {%- endif -%}
         {%- if post.categories contains "animation" -%}
-            <i class="fa-solid fa-film"></i>
+            <i class="fa-solid fa-clapperboard"></i>
+        {%- endif -%}
+        {%- if post.categories contains "game" -%}
+            <i class="fa-solid fa-gamepad"></i>
         {%- endif -%}
 
         {%- if site.show_excerpts -%}
@@ -60,30 +63,87 @@ layout: default
 
 </div>
 
+<script>
+  // randomize
+function randomize(){
+var tags = document.querySelectorAll('.tags');
+  for (var tag = 0; tag < tags.length; tag++){
+    for (var i = tags[tag].children.length; i >= 0; i--) {
+      tags[tag].appendChild(tags[tag].children[Math.random() * i | 0]);
+    }
+  }
+}
+
+  // expand
+function expand(){
+  var tags = document.querySelectorAll('.tags');
+  for (var tag = 0; tag < tags.length; tag++){
+    var titleWidth = tags[tag].previousElementSibling.clientWidth;
+    var n = Math.floor(titleWidth / 25);
+
+    var len = tags[tag].children.length;
+    var goal = n - len;
+    var q = Math.floor(goal / len);
+    var r = goal % len;
+
+    var initLen = tags[tag].children.length;
+    for (var i = 0; i < q; i++){
+      for (var j = 0; j < initLen; j++){
+        var clone = tags[tag].children[j].cloneNode(true);
+        tags[tag].appendChild(clone);
+      }
+    }
+    for (var i = 1; i <= r; i++){
+      var clone = tags[tag].children[i].cloneNode(true);
+      tags[tag].appendChild(clone);
+    }
+  }
+}
+
+// recolor
+function recolor(){
+  var tags = document.querySelectorAll('.tags');
+  for (var tag = 0; tag < tags.length; tag++){
+    var len = tags[tag].children.length;
+    for (var i = 0; i < len; i++){
+      var amt = Math.floor((230 / len) * i) + 15;
+      tags[tag].children[i].style.color = `rgb(${amt},${amt},${amt})`
+    }
+  }
+}
+
+  // scroll
+function scrollTags(){
+  var tags = document.querySelectorAll('.tags');
+  for (var tag = 0; tag < tags.length; tag++){
+    tags[tag].prepend(tags[tag].children[tags[tag].children.length - 1]);
+  }
+  recolor();
+  setTimeout(() => scrollTags(), 800);
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  randomize();
+  expand();
+  scrollTags()
+});
+</script>
+
 <style>
 .post-title {
     margin: 4px 0 4px 0;
+    width: fit-content;
 }
 
 .tags {
     display: block;
-    text-align: baseline;
-}
-
-.tags i:nth-child(1) {
-    color: gray;
-}
-
-.tags i:nth-child(2) {
-    color: darkgray;
-}
-
-.tags i:nth-child(3) {
-    color: lightgray;
+    height: 24px;
 }
 
 i {
     width: 25px;
+    position: relative;
     text-align: center;
 }
+
 </style>
