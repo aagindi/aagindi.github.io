@@ -49,6 +49,9 @@ layout: default
         {%- if post.categories contains "game" -%}
             <i class="fa-solid fa-gamepad"></i>
         {%- endif -%}
+        {%- if post.categories contains "love" -%}
+            <i class="fa-solid fa-heart"></i>
+        {%- endif -%}
 
         {%- if site.show_excerpts -%}
           {{ post.excerpt }}
